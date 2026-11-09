@@ -12,11 +12,11 @@ This integration branch combines the source changes proposed in upstream PRs
 - Keep RFCOMM recovery within its attempt budget, with stale callbacks ignored.
 - Give socket connection and session initialization separate timeout windows.
 - Preserve wear detection and screen timeout across reconnects.
-- Add explicit Autolock duration requests of 15, 30 or 120 seconds and a read
+- Add explicit Autolock duration requests of 60, 120, 300 or 900 seconds and a read
   request. The UI reports requested state separately from an actual incoming
   timeout report, with stale sessions and expired reads rejected.
 
-Revision 2 keeps version name 0.4 and uses version code 5 (revision 1 used 4). Compile/target SDK remains 34 and
+Revision 3 keeps version name 0.4 and uses version code 6 (revisions 1 and 2 used 4 and 5). Compile/target SDK remains 34 and
 minimum SDK remains 26. No SDK migration is included in these protocol fixes.
 
 ## Separate installation
@@ -53,8 +53,10 @@ results and APK verification output are recorded alongside the built artifact.
 
 Live validation established BLE pairing and a settings response containing
 {"screen_off_time":10}. A short RFCOMM-ready interval subsequently ended in a
-peer reset. A requested 120-second timeout was not reflected by a later read,
-so successful application of new settings remains unverified. Revision 2 adds
+peer reset. An initial 120-second request was not reflected by the next read; after a
+new awake session, the glasses reported 120 and the user confirmed the display
+stayed awake beyond one minute. The precise triggering action is not isolated.
+Other presets still require live acceptance checks. Revision 2 added
 a narrow decoder for the observed launcher reply, keeps the reported value
 separate from requested state, and preserves BLE readback during unrelated
 relay retries. This build does not change firmware or claim to fix every later
