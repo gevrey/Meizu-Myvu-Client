@@ -7,14 +7,16 @@ This integration branch combines the source changes proposed in upstream PRs
 [9](https://github.com/Panny777/Meizu-Myvu-Client/pull/9).
 
 - Discover IMIKI glasses from their manufacturer advertisement and start with
-  an empty MAC field on a new installation.
+  an empty MAC field on a new installation. Recognize cached IMIKI names in
+  the bonded-device fallback when no advertisement is received.
 - Keep RFCOMM recovery within its attempt budget, with stale callbacks ignored.
 - Give socket connection and session initialization separate timeout windows.
 - Preserve wear detection and screen timeout across reconnects.
 - Add explicit Autolock duration requests of 15, 30 or 120 seconds and a read
-  request. The UI reports requested state, not unverified application success.
+  request. The UI reports requested state separately from an actual incoming
+  timeout report, with stale sessions and expired reads rejected.
 
-Version name is 0.4 and version code is 4. Compile/target SDK remains 34 and
+Revision 2 keeps version name 0.4 and uses version code 5 (revision 1 used 4). Compile/target SDK remains 34 and
 minimum SDK remains 26. No SDK migration is included in these protocol fixes.
 
 ## Separate installation
@@ -41,7 +43,7 @@ The signed test APK is `app/build/outputs/apk/debug/app-debug.apk`. APKs and
 signing keys are excluded from Git. Publishing this branch is not an official
 upstream release or an APK deployment.
 
-The integrated build passes all 156 JVM tests across 18 suites, with no failures
+The integrated build passes all 168 JVM tests across 19 suites, with no failures
 or skipped tests. The signed APK reports version 0.4, version code 4, the
 separate test package and the expected launcher activity. The new Autolock UI
 also compiles and its independent branch passes 136 JVM tests.
@@ -49,6 +51,11 @@ Android lint reports the same pre-existing 20 errors and 144 warnings as the
 upstream base, with no new findings from that UI change. Full integration test
 results and APK verification output are recorded alongside the built artifact.
 
-Hardware validation is still required. The Autolock reply schema and firmware
-acceptance of requested values have not been established on the target glasses.
-This build does not change firmware or claim to fix every later socket loss.
+Live validation established BLE pairing and a settings response containing
+{"screen_off_time":10}. A short RFCOMM-ready interval subsequently ended in a
+peer reset. A requested 120-second timeout was not reflected by a later read,
+so successful application of new settings remains unverified. Revision 2 adds
+a narrow decoder for the observed launcher reply, keeps the reported value
+separate from requested state, and preserves BLE readback during unrelated
+relay retries. This build does not change firmware or claim to fix every later
+socket loss. Local raw logs and device identifiers are excluded from Git.
